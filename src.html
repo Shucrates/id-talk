@@ -1,0 +1,922 @@
+<title>Custom ID Talk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Sans+Narrow:wght@400;700&family=VT323&display=swap">
+<style>
+/* Layout: full-screen snap "slides" on the site's #fafafa desktop, Win95 windows as content frames, a floating ID card as the opener. */
+:root {
+  --desk: #fafafa;
+  --ink: #0b0b0f;
+  --blue: #1d19ea;
+  --green: #12ba10;
+  --grey: #c0c0c0;
+  --grey-hi: #dfdfdf;
+  --grey-lo: #808080;
+  --grey-dk: #505050;
+  --paper: #ffffff;
+  --muted: #55555f;
+  --red: #d4142b;
+  --f-narrow: 'PT Sans Narrow', 'Arial Narrow', Arial, sans-serif;
+  --f-pixel: 'VT323', 'Courier New', monospace;
+  --f-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --bevel: inset 1px 1px 0 #ffffff, inset 2px 2px 0 #e0e0e0, inset -1px -1px 0 #505050, inset -2px -2px 0 #808080;
+  --bevel-in: inset -1px -1px 0 #ffffff, inset -2px -2px 0 #e0e0e0, inset 1px 1px 0 #505050, inset 2px 2px 0 #808080;
+  --bar: 46px;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-snap-type: y proximity; scroll-behavior: smooth; }
+body { margin: 0; background: var(--desk); color: var(--ink); font-family: var(--f-narrow); font-size: 20px; line-height: 1.4; overflow-x: hidden; }
+::selection { background: var(--blue); color: var(--paper); }
+a { color: var(--blue); }
+:focus-visible { outline: 3px dashed var(--blue); outline-offset: 3px; }
+
+/* ── slides ── */
+.slide {
+  position: relative;
+  min-height: 100svh;
+  scroll-snap-align: start;
+  display: flex; flex-direction: column; justify-content: center;
+  padding-block: 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  overflow: hidden;
+}
+.inner { width: 100%; max-width: 1240px; margin-inline: auto; position: relative; z-index: 5; }
+.label { font-family: var(--f-pixel); font-size: 26px; color: var(--blue); letter-spacing: 1px; text-transform: lowercase; }
+h1, h2, h3 { font-weight: 400; margin: 0; text-wrap: balance; letter-spacing: -0.04em; line-height: 0.98; }
+h1 { font-size: clamp(52px, 9vw, 132px); color: var(--blue); }
+h2 { font-size: clamp(42px, 6.2vw, 92px); color: var(--blue); }
+h3 { font-size: clamp(26px, 2.4vw, 34px); letter-spacing: -0.02em; line-height: 1.1; font-weight: 700; }
+p { margin: 0; max-width: 60ch; }
+.lede { font-size: clamp(20px, 1.9vw, 27px); line-height: 1.35; color: var(--ink); }
+.muted { color: var(--muted); }
+.green { color: var(--green); }
+.stack { display: flex; flex-direction: column; gap: 24px; }
+.row { display: flex; gap: 40px; align-items: center; flex-wrap: wrap; }
+.row > * { min-width: 0; }
+.grow { flex: 1 1 380px; }
+
+/* ── win95 pieces ── */
+.win { background: var(--grey); box-shadow: var(--bevel), 0 0 0 1px #000, 6px 6px 0 rgba(11,11,15,.18); padding: 4px; max-width: 100%; }
+.win-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: linear-gradient(90deg, var(--blue), #6f8cff); color: var(--paper); padding: 3px 4px 3px 8px; font-family: var(--f-pixel); font-size: 22px; line-height: 1; }
+.win-bar span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.win-btns { display: flex; gap: 3px; flex: none; }
+.win-btns i { width: 22px; height: 20px; background: var(--grey); box-shadow: var(--bevel); color: var(--ink); font-style: normal; font-size: 18px; display: grid; place-items: center; }
+.win-body { padding: 16px; }
+.btn { font-family: var(--f-narrow); font-weight: 700; font-size: 20px; color: var(--ink); background: linear-gradient(180deg, var(--grey-hi), var(--grey)); border: 0; border-radius: 0; padding: 10px 26px; box-shadow: var(--bevel), 0 0 0 1px #000; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.btn:hover { box-shadow: var(--bevel), 0 0 0 3px #000; }
+.btn:active { box-shadow: var(--bevel-in), 0 0 0 1px #000; transform: translate(1px,1px); }
+.sunken { background: var(--paper); box-shadow: var(--bevel-in); padding: 14px; }
+
+/* placeholder slots for real assets */
+.ph { border: 2px dashed var(--grey-lo); background: repeating-linear-gradient(45deg, #f0f0f2 0 14px, #e8e8ec 14px 28px); display: grid; place-items: center; text-align: center; color: var(--muted); font-family: var(--f-pixel); font-size: 22px; line-height: 1.1; padding: 16px; }
+.ph b { display: block; color: var(--blue); font-weight: 400; font-size: 26px; }
+
+/* ── stickers (draggable, floating like the site) ── */
+.sticker { position: absolute; z-index: 3; cursor: grab; touch-action: none; user-select: none; animation: bob 6s ease-in-out infinite; }
+.sticker img { display: block; pointer-events: none; width: 100%; height: auto; }
+.sticker.drag { cursor: grabbing; animation-play-state: paused; z-index: 50; }
+.sticker .pz { transition: transform .45s cubic-bezier(.25,.46,.45,.94); }
+@keyframes bob { 0%,100% { translate: 0 0; } 50% { translate: 0 -10px; } }
+.q { font-size: clamp(28px, 3.4vw, 46px); color: var(--blue); }
+
+/* ── reveal motion (only once JS is running; content is visible without it) ── */
+.js .rv { opacity: 0; transform: translateY(26px); transition: opacity .6s ease, transform .7s cubic-bezier(.2,.8,.2,1); transition-delay: calc(var(--d, 0) * 110ms); }
+.js .in .rv { opacity: 1; transform: none; }
+.js .pop { opacity: 0; transform: scale(.7); transition: opacity .3s ease, transform .45s cubic-bezier(.3,1.6,.5,1); transition-delay: calc(var(--d, 0) * 260ms + 300ms); }
+.js .in .pop { opacity: 1; transform: none; }
+
+/* ── 01 hero: the floating ID card (scroll flips it) ── */
+#s-hero { height: 260svh; min-height: 0; display: block; padding: 0; overflow: visible; scroll-snap-align: start; }
+.hero-stage { position: sticky; top: 0; height: 100svh; display: grid; place-items: center; overflow: hidden; perspective: 1600px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.float { position: relative; width: min(900px, 86vw); aspect-ratio: 728 / 460; animation: hover 5.5s ease-in-out infinite; transform-style: preserve-3d; }
+@keyframes hover { 0%,100% { translate: 0 -10px; } 50% { translate: 0 12px; } }
+.idcard { position: absolute; inset: 0; transform-style: preserve-3d; will-change: transform;
+  transform: rotateX(calc(9deg + var(--my, 0) * -7deg)) rotateY(calc(-16deg + var(--flip, 0) * 180deg + var(--mx, 0) * 9deg)) rotateZ(-3.5deg); }
+.face { position: absolute; inset: 0; border-radius: min(13px, 1.75vw); overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: #f1eee8;
+  box-shadow: 0 0 0 1px rgba(11,11,15,.08), 0 30px 60px -20px rgba(29,25,234,.28), 0 18px 30px -18px rgba(11,11,15,.35); }
+.face img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.face.back { transform: rotateY(180deg); }
+/* gloss: a moving specular band plus a faint holographic film */
+.face::before, .face::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; }
+.face::before { background: linear-gradient(115deg, transparent 32%, rgba(255,255,255,.75) 46%, rgba(255,255,255,.15) 52%, transparent 62%); background-size: 260% 100%; background-position: calc(var(--g, 50) * 1%) 0; mix-blend-mode: soft-light; opacity: .95; }
+.face::after { background: linear-gradient(125deg, rgba(255,255,255,0) 25%, rgba(255,255,255,.22) 45%, rgba(255,255,255,.08) 55%, rgba(255,255,255,0) 75%); background-size: 220% 220%; background-position: calc(var(--g, 50) * 1%) calc(100% - var(--g, 50) * 1%); mix-blend-mode: screen; opacity: .8; box-shadow: inset 0 1px 0 rgba(255,255,255,.9), inset 0 0 0 1px rgba(255,255,255,.35); }
+.ground { position: absolute; left: 50%; bottom: calc(50% - min(900px, 86vw) * 0.36 - 70px); width: min(620px, 72vw); height: 44px; margin-left: calc(min(620px, 72vw) / -2); border-radius: 50%; background: radial-gradient(closest-side, rgba(29,25,234,.22), rgba(11,11,15,.10) 55%, transparent); filter: blur(6px); animation: groundpulse 5.5s ease-in-out infinite; }
+@keyframes groundpulse { 0%,100% { transform: scale(.86); opacity: .75; } 50% { transform: scale(1.05); opacity: 1; } }
+
+/* ── 02 origin ── */
+.cardslot { width: min(340px, 100%); aspect-ratio: 54 / 86; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.fact { background: var(--paper); border: 1px solid var(--ink); padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; }
+.fact .label { font-size: 22px; }
+
+/* ── 03 first video ── */
+.phone { width: min(300px, 80vw); aspect-ratio: 9 / 19; background: var(--ink); border-radius: 34px; padding: 12px; box-shadow: 8px 8px 0 rgba(11,11,15,.18); flex: none; }
+.phone .ph { width: 100%; height: 100%; border-radius: 24px; border-color: #3a3a46; }
+.views { font-family: var(--f-pixel); font-size: clamp(64px, 9vw, 130px); color: var(--blue); line-height: .9; font-variant-numeric: tabular-nums; }
+.but { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+
+/* ── 04 build: terminal + tilted card ── */
+.term { background: #0b0b0f; color: #d8d8e0; font-family: var(--f-pixel); font-size: 24px; line-height: 1.25; padding: 18px; min-height: 230px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.term .c { color: #7ee07c; }
+.term .h { color: #8fa2ff; }
+.tilt { perspective: 1200px; display: grid; place-items: center; flex: 0 1 420px; }
+.tilt img { width: min(400px, 100%); filter: drop-shadow(10px 14px 0 rgba(11,11,15,.15)); transform: rotateY(-14deg) rotateX(6deg) rotateZ(-3deg); transition: transform .9s cubic-bezier(.2,.8,.2,1); }
+.js .tilt img { transform: rotateY(70deg) rotateX(6deg); }
+.js .in .tilt img { transform: rotateY(-14deg) rotateX(6deg) rotateZ(-3deg); }
+.tilt img:hover { transform: rotateY(8deg) rotateX(-4deg) rotateZ(1deg) scale(1.03) !important; }
+
+/* ── 05 dms ── */
+.dmwin { flex: 1 1 400px; }
+.dms { display: flex; flex-direction: column; gap: 10px; min-height: 360px; }
+.dm { align-self: flex-start; max-width: 88%; background: #efeff4; border-radius: 18px 18px 18px 4px; padding: 10px 16px; font-size: 21px; line-height: 1.25; }
+.dm small { display: block; font-family: var(--f-pixel); font-size: 18px; color: var(--muted); }
+.dm.me { align-self: flex-end; background: var(--blue); color: var(--paper); border-radius: 18px 18px 4px 18px; }
+.dm.me small { color: #c9cfff; }
+.shipped { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex: 1 1 460px; }
+.ship { background: var(--paper); border: 1px solid var(--ink); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.ship .art { height: 230px; display: grid; place-items: center; background: #f0f0f3; }
+.ship .art img { max-height: 210px; width: auto; max-width: 100%; }
+.stamp { font-family: var(--f-pixel); font-size: 22px; color: var(--green); }
+
+/* ── 06 numbers ── */
+#s-numbers { background: var(--blue); color: var(--paper); }
+#s-numbers .label { color: #c9cfff; }
+.big { font-family: var(--f-pixel); font-size: clamp(90px, 17vw, 250px); line-height: .85; letter-spacing: -2px; font-variant-numeric: tabular-nums; }
+.stairs { display: grid; grid-template-columns: repeat(5, 1fr); align-items: end; gap: 10px; height: 260px; border-bottom: 2px solid var(--paper); }
+.step { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; gap: 6px; }
+.step i { display: block; background: var(--paper); height: calc(var(--h) * 1%); transform-origin: bottom; transition: transform .8s cubic-bezier(.2,.8,.2,1); transition-delay: calc(var(--d) * 140ms + 200ms); }
+.js .step i { transform: scaleY(0); }
+.js .in .step i { transform: none; }
+.step span { font-family: var(--f-pixel); font-size: 26px; line-height: 1; }
+.burned { font-size: clamp(22px, 2.2vw, 30px); }
+
+/* ── 07 crash ── */
+#s-crash.glitch .inner { animation: shake .5s steps(2) 3; }
+#s-crash.glitch h2 { animation: rgb .9s steps(3) 2; }
+@keyframes shake { 0% { transform: translate(0,0); } 25% { transform: translate(-8px,4px) skewX(2deg); } 50% { transform: translate(6px,-5px); } 75% { transform: translate(-4px,-2px) skewX(-2deg); } 100% { transform: none; } }
+@keyframes rgb { 0%,100% { text-shadow: none; } 50% { text-shadow: -5px 0 var(--red), 5px 0 var(--green); } }
+.scan { position: absolute; inset: 0; pointer-events: none; z-index: 8; background: repeating-linear-gradient(0deg, rgba(29,25,234,.09) 0 2px, transparent 2px 5px); opacity: 0; }
+#s-crash.glitch .scan { animation: flick 1.4s steps(4) 1; }
+@keyframes flick { 0%,100% { opacity: 0; } 20%,60% { opacity: 1; } 40% { opacity: .3; } }
+.err { width: min(560px, 100%); }
+.err .win-bar { background: linear-gradient(90deg, #7a0a17, var(--red)); }
+.err-row { display: flex; gap: 16px; align-items: flex-start; }
+.err-row img { width: 64px; flex: none; }
+.err-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+.js .err { transform: scale(.6); opacity: 0; transition: transform .35s cubic-bezier(.3,1.6,.5,1), opacity .2s; transition-delay: .5s; }
+.js .in .err { transform: none; opacity: 1; }
+.cfx { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+.cfx > div { border-top: 4px solid var(--ink); padding-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+.cfx > div.fix { border-color: var(--green); }
+.cfx .label { font-size: 22px; }
+code { font-family: var(--f-pixel); font-size: 1.1em; background: #ececf1; padding: 0 5px; }
+
+/* ── 08 demo ── */
+.demo-win { width: 100%; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.steps button { width: 100%; text-align: left; font: inherit; font-size: 22px; background: var(--paper); border: 0; box-shadow: var(--bevel-in); padding: 14px; cursor: pointer; display: flex; gap: 12px; align-items: flex-start; color: var(--ink); line-height: 1.2; }
+.steps .box { flex: none; width: 24px; height: 24px; background: var(--paper); box-shadow: var(--bevel-in); display: grid; place-items: center; font-family: var(--f-pixel); font-size: 26px; color: var(--green); margin-top: 2px; }
+.steps button[aria-pressed="true"] .box::after { content: "✓"; }
+.steps button[aria-pressed="true"] span:last-child { color: var(--muted); text-decoration: line-through; }
+.urlbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.urlbar .sunken { flex: 1 1 260px; font-family: var(--f-pixel); font-size: 26px; padding: 8px 12px; }
+
+/* ── 09 how: exploded layers ── */
+.layers { position: relative; flex: 0 1 460px; height: 470px; perspective: 1400px; }
+.layer { position: absolute; left: 50%; top: 50%; width: 220px; height: 340px; margin: -170px 0 0 -110px; transform-style: preserve-3d; transform: rotateX(58deg) rotateZ(-36deg) translateZ(calc(var(--z) * 24px)); transition: transform 1s cubic-bezier(.2,.8,.2,1); transition-delay: calc(var(--i) * 120ms); border: 2px solid var(--ink); }
+.in .layer, .nojs .layer { transform: rotateX(58deg) rotateZ(-36deg) translateZ(calc(var(--z) * 92px)); }
+.layer.l1 { background: repeating-linear-gradient(135deg, #e6e6ec 0 10px, #f6f6f9 10px 20px); }
+.layer.l2 { background: transparent; }
+.layer.l2::before { content: ""; position: absolute; left: 40px; top: 50px; width: 140px; height: 170px; background: #b9c1ff; border: 2px solid var(--blue); }
+.layer.l3 { background: transparent; }
+.layer.l3::before { content: ""; position: absolute; left: 30px; right: 30px; top: 245px; height: 12px; background: var(--ink); box-shadow: 0 24px 0 #55555f, 0 44px 0 #55555f; }
+.layer.l4 { background: transparent; }
+.layer.l4 img { position: absolute; right: 18px; top: 16px; width: 64px; height: auto; }
+.layer-tags { display: flex; flex-direction: column; gap: 12px; }
+.layer-tags li { display: flex; gap: 14px; align-items: baseline; }
+.layer-tags .label { width: 46px; flex: none; }
+.layer-tags ol { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-family: var(--f-pixel); font-size: 22px; background: var(--grey); box-shadow: var(--bevel), 0 0 0 1px #000; padding: 4px 10px; }
+.chip.hot { background: var(--blue); color: var(--paper); box-shadow: 0 0 0 1px #000; }
+.code { font-family: var(--f-pixel); font-size: 21px; line-height: 1.2; white-space: pre; overflow-x: auto; margin: 0; }
+.code .k { color: var(--blue); }
+.code .s { color: #0e8a0d; }
+
+/* ── 10 lesson ── */
+#s-lesson .inner { display: flex; flex-direction: column; gap: 28px; }
+.mega { font-size: clamp(60px, 12vw, 190px); color: var(--blue); line-height: .88; letter-spacing: -0.05em; }
+.mega span { color: var(--ink); display: block; }
+.js #s-lesson .mega .w { display: inline-block; opacity: 0; transform: translateY(40px) rotate(4deg); transition: opacity .4s, transform .6s cubic-bezier(.3,1.5,.5,1); transition-delay: calc(var(--d) * 180ms); }
+.js #s-lesson.in .mega .w { opacity: 1; transform: none; }
+
+/* ── 11 close ── */
+.qr { width: min(300px, 70vw); background: var(--paper); padding: 10px; border: 1px solid var(--ink); }
+.qr img { display: block; width: 100%; image-rendering: pixelated; }
+.links { font-family: var(--f-pixel); font-size: clamp(26px, 2.6vw, 36px); line-height: 1.25; }
+
+
+/* ── scroll-scrubbed sections share a sticky stage ── */
+.scrub { height: var(--len, 240svh); min-height: 0; display: block; padding: 0; overflow: visible; }
+.stage { position: sticky; top: 0; height: 100svh; display: grid; place-items: center; overflow: hidden; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* ── 00 hi dublin: typewriter ── */
+.typer { font-family: var(--f-narrow); color: var(--blue); font-size: clamp(64px, 12vw, 190px); line-height: 1; letter-spacing: -0.05em; white-space: nowrap; display: flex; align-items: center; }
+.caret { display: inline-block; width: 0.055em; height: 0.92em; background: var(--blue); margin-left: 0.05em; translate: 0 0.04em; }
+.caret.idle { animation: caret 1.05s steps(1) infinite; }
+@keyframes caret { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0; } }
+
+/* ── 02 account: one button, a click, then the profile ── */
+.acct { position: relative; width: min(980px, 100%); min-height: 420px; display: grid; place-items: center; font-family: var(--f-narrow); }
+.acct > * { grid-area: 1 / 1; }
+.cta { font-family: var(--f-narrow); font-weight: 700; font-size: clamp(30px, 3.4vw, 46px); letter-spacing: -0.02em; padding: 20px 56px; will-change: transform, opacity; }
+.cta.pressed { box-shadow: var(--bevel-in), 0 0 0 1px #000; background: linear-gradient(180deg, #b0b0b0, #a0a0a0); }
+.pointer { position: absolute; left: 0; top: 0; width: 40px; z-index: 20; pointer-events: none; will-change: transform; filter: drop-shadow(2px 3px 0 rgba(11,11,15,.18)); }
+.click-ring { position: absolute; left: 0; top: 0; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%; border: 3px solid var(--blue); opacity: 0; pointer-events: none; z-index: 19; }
+.profile { width: 100%; display: flex; gap: clamp(28px, 4vw, 64px); align-items: center; flex-wrap: wrap; justify-content: center; }
+.avatar { position: relative; width: clamp(200px, 22vw, 290px); aspect-ratio: 1; flex: none; }
+.avatar svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.avatar img { position: absolute; inset: 7%; width: 86%; height: 86%; border-radius: 50%; object-fit: cover; }
+.pinfo { flex: 0 1 460px; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.pinfo { font-family: var(--f-ui); }
+.handle { font-size: clamp(30px, 3vw, 40px); font-weight: 600; letter-spacing: -0.01em; line-height: 1.1; color: var(--ink); }
+.stats { display: flex; gap: clamp(24px, 3vw, 44px); flex-wrap: wrap; }
+.stat { display: flex; flex-direction: column; gap: 4px; }
+.stat b { font-size: clamp(34px, 3.4vw, 48px); font-weight: 600; line-height: 1; letter-spacing: -0.01em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.stat span { font-size: clamp(18px, 1.5vw, 21px); color: var(--muted); }
+.bio { font-size: clamp(22px, 2vw, 28px); font-weight: 400; color: var(--ink); min-height: 1.3em; line-height: 1.3; letter-spacing: 0; }
+.joined { font-size: clamp(16px, 1.3vw, 19px); color: var(--muted); }
+.reveal-s { opacity: var(--o, 0); transform: translateY(calc((1 - var(--o, 0)) * 16px)); }
+
+/* ── 03 archive: looping poster carousel ── */
+#s-archive { padding-left: 0; padding-right: 0; gap: clamp(56px, 10vh, 120px); }
+.archive-h { text-align: center; font-family: var(--f-narrow); font-size: clamp(28px, 3.2vw, 48px); letter-spacing: -0.03em; line-height: 1.15; color: var(--ink); padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); margin: 0; font-weight: 400; }
+.archive-h { min-height: 1.2em; }
+.hl:empty { display: none; }
+.arch-caret { width: 3px; height: 1em; margin-left: 4px; translate: 0 0.14em; }
+.hl { background: var(--blue); color: var(--paper); padding: 0 0.22em 0.04em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.marquee { width: 100%; overflow: hidden; pointer-events: none; user-select: none; }
+.track { display: flex; gap: clamp(16px, 1.6vw, 28px); width: max-content; animation: slide 70s linear infinite; padding-block: 18px; }
+.track img { height: clamp(170px, 32vh, 340px); width: auto; display: block; box-shadow: 0 14px 28px -16px rgba(11,11,15,.4); -webkit-user-drag: none; }
+@keyframes slide { to { transform: translateX(-50%); } }
+
+/* ── 05 origin: card flip + reel + metrics ── */
+.origin-wrap { position: relative; width: 100%; height: 100%; display: grid; place-items: center; overflow: hidden; }
+.origin-head { position: absolute; font-family: var(--f-narrow); font-size: clamp(32px, 5vw, 72px); letter-spacing: -0.04em; line-height: 1; color: var(--ink); text-align: center; margin: 0; will-change: opacity, transform; }
+.ori-card-wrap { position: absolute; width: min(620px, 80vw); aspect-ratio: 1370 / 930; perspective: 1400px; will-change: opacity; }
+.ori-card { position: absolute; inset: 0; transform-style: preserve-3d; will-change: transform;
+  transform: rotateY(calc(var(--flip, 0) * 180deg)) rotateX(4deg) rotateZ(-2deg); }
+.ori-card .face { position: absolute; inset: 0; border-radius: 14px; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  box-shadow: 0 24px 48px -16px rgba(11,11,15,.35); }
+.ori-card .face img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ori-card .face.back { transform: rotateY(180deg); }
+.ori-card .face::before { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.6) 46%, rgba(255,255,255,.1) 54%, transparent 64%);
+  background-size: 260% 100%; background-position: calc(var(--g, 50) * 1%) 0; mix-blend-mode: soft-light; opacity: .8; }
+.ori-reel { position: absolute; will-change: opacity, transform; }
+.ori-vidwin { width: min(300px, 68vw); }
+.ori-vidwin .win { box-shadow: var(--bevel), 0 0 0 1px #000, 0 24px 44px -18px rgba(11,11,15,.4); }
+.ori-metric { position: absolute; display: flex; flex-direction: column; gap: 20px; will-change: opacity, transform; }
+.ori-ml { right: calc(50% + min(180px, 40vw)); text-align: right; }
+.ori-mr { left: calc(50% + min(180px, 40vw)); text-align: left; }
+.ori-stat { display: flex; flex-direction: column; gap: 4px; }
+.ori-num { font-family: var(--f-narrow); font-weight: 700; font-size: clamp(40px, 5.5vw, 72px); color: var(--blue); line-height: .95; letter-spacing: -0.03em; }
+.ori-lbl { font-family: var(--f-narrow); font-size: clamp(16px, 1.8vw, 22px); color: var(--muted); text-transform: lowercase; }
+
+/* inbox */
+.inbox-wrap { position:relative; width:100%; height:100%; display:grid; place-items:center; overflow:hidden; }
+.inbox-cell { display:flex; align-items:center; gap:16px; background:#fff; border-radius:16px; padding:20px 36px; box-shadow:0 2px 12px rgba(0,0,0,.08); position:relative; z-index:2; }
+.inbox-icon { display:grid; place-items:center; }
+.inbox-label { font-family:var(--f-ui); font-size:clamp(28px,4vw,48px); font-weight:600; color:var(--ink); }
+.inbox-badge { position:absolute; top:-10px; right:-10px; min-width:28px; height:28px; line-height:28px; padding:0 8px; border-radius:14px; background:#ff3b30; color:#fff; font-family:var(--f-ui); font-size:15px; font-weight:700; text-align:center; }
+.dm-cloud { position:absolute; inset:0; pointer-events:none; z-index:1; }
+.dm-cloud .dm-float { position:absolute; background:rgba(255,255,255,.75); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); border-radius:20px; padding:10px 18px; font-family:var(--f-ui); font-size:clamp(13px,1.4vw,16px); color:var(--ink); max-width:280px; opacity:0; animation:dmFloat 4s ease-out forwards; box-shadow:0 1px 6px rgba(0,0,0,.06); }
+@keyframes dmFloat { 0%{opacity:0;transform:translateY(10px)} 12%{opacity:.65} 75%{opacity:.55} 100%{opacity:0;transform:translateY(-20px)} }
+
+/* ── 04 bored files: a folder that opens into a looping video ── */
+.bf { position: relative; width: 100%; height: 100%; }
+.folder { position: absolute; left: 50%; top: 78%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 4; }
+.folder .ico { position: relative; width: 92px; height: 76px; padding: 4px; border-radius: 8px; perspective: 300px; }
+.folder .mac { display: block; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 2px 2px rgba(11,11,15,.22)); }
+.folder .flap { transform-origin: 50% 95%; transform-box: fill-box; transition: transform .35s cubic-bezier(.3,1.4,.5,1); }
+.folder.is-open .flap { transform: rotateX(38deg) translateY(2px); }
+.folder.sel .ico { background: rgba(11,11,15,.12); }
+.folder .name { font-family: var(--f-ui); font-size: 16px; font-weight: 500; line-height: 1.2; padding: 2px 8px; border-radius: 5px; color: var(--ink); }
+.folder.sel .name { background: #2a6fdb; color: #ffffff; }
+.vidwin { position: absolute; left: 0; right: 0; margin-inline: auto; top: 7%; width: min(820px, 84vw, calc((100svh - 400px) * 16 / 9)); z-index: 6; transform-origin: 50% 50%; will-change: transform, opacity; }
+.vidwin .hov { animation: bob 5s ease-in-out infinite; }
+.vidwin .win { box-shadow: var(--bevel), 0 0 0 1px #000, 0 30px 50px -24px rgba(11,11,15,.45); }
+.vidwin .win-body { padding: 4px; }
+.vidwin video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #000; box-shadow: var(--bevel-in); }
+.vstatus { display: flex; gap: 4px; margin-top: 4px; font-family: var(--f-narrow); font-size: 18px; }
+.vstatus span { flex: 1; box-shadow: inset -1px -1px 0 #fff, inset 1px 1px 0 #808080; padding: 2px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vstatus span:first-child { flex: 2; }
+.zoomrect { position: absolute; border: 2px dotted var(--ink); pointer-events: none; z-index: 5; opacity: 0; }
+.bf .pointer { z-index: 8; }
+
+@media (max-width: 720px) {
+  body { font-size: 18px; }
+  .slide { padding-block: 40px; }
+  .layers { height: 380px; transform: scale(.8); }
+  .stairs { height: 180px; }
+  .shipped { grid-template-columns: 1fr; }
+  .sticker.hide-sm { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .js .rv, .js .pop, .js .err, .js #s-lesson .mega .w { opacity: 1 !important; transform: none !important; }
+  .js .step i, .js .tilt img { transform: none !important; }
+}
+</style>
+
+<main id="deck">
+
+<!-- 00 HI DUBLIN -->
+<section class="slide scrub" id="s-hi" style="--len:200svh" data-stops="0,1" aria-label="Hi Dublin">
+  <div class="stage" id="hi-stage">
+    <p class="typer" aria-live="polite"><span id="typer-text"></span><span class="caret idle" id="typer-caret" aria-hidden="true"></span></p>
+  </div>
+</section>
+
+<!-- 01 HERO -->
+<section class="slide" id="s-hero" data-stops="0,1" aria-label="Opening: shuisbored ID card">
+  <div class="hero-stage">
+    <div class="ground" aria-hidden="true"></div>
+    <div class="float">
+      <div class="idcard" id="idcard">
+        <div class="face front"><img src="{{back}}" alt="Card front: photo of Shubham Patil with a camera, id @shuisbored, and the line designer. developer. dreamer."></div>
+        <div class="face back"><img src="{{front}}" alt="Card back: (shuisbored) in blue, with earphones, sparkles and a Spotify code"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 ACCOUNT -->
+<section class="slide scrub" id="s-acct" style="--len:300svh" data-stops="0,0.36,1" aria-label="Creating the Instagram account">
+  <div class="stage">
+    <div class="acct" id="acct">
+      <span class="btn cta" id="create-btn">create account</span>
+      <div class="profile" id="pane-profile" aria-label="Profile: shuisbored, 1 post, 50 followers, 12 following, bio I’m bored, joined September 2024">
+        <div class="avatar">
+          <svg viewBox="0 0 210 210" aria-hidden="true">
+            <defs><linearGradient id="ring" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#f9ce34"/><stop offset=".45" stop-color="#ee2a7b"/><stop offset="1" stop-color="#6228d7"/></linearGradient></defs>
+            <circle cx="105" cy="105" r="100" fill="none" stroke="url(#ring)" stroke-width="7" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" id="ring-c"/>
+          </svg>
+          <img src="{{avatar}}" alt="Profile photo of Shubham holding a camera">
+        </div>
+        <div class="pinfo">
+          <span class="handle reveal-s" id="r-handle">shuisbored</span>
+          <div class="stats">
+            <div class="stat reveal-s" id="r-s1"><b data-to="1">1</b><span>post</span></div>
+            <div class="stat reveal-s" id="r-s2"><b data-to="50">50</b><span>followers</span></div>
+            <div class="stat reveal-s" id="r-s3"><b data-to="12">12</b><span>following</span></div>
+          </div>
+          <p class="bio" id="r-bio">I’m bored</p>
+          <span class="joined reveal-s" id="r-joined">joined september 2024</span>
+        </div>
+      </div>
+      <svg class="pointer" id="pointer" viewBox="0 0 24 30" aria-hidden="true"><path d="M2 2 L2 24 L8 18.5 L12 27 L15.5 25.5 L11.5 17 L19 17 Z" fill="#ffffff" stroke="#0b0b0f" stroke-width="2" stroke-linejoin="miter"/></svg>
+      <span class="click-ring" id="click-ring"></span>
+    </div>
+  </div>
+</section>
+
+<!-- 03 ARCHIVE -->
+<section class="slide" id="s-archive" aria-label="Started as a graphic design archive">
+  <h2 class="archive-h" id="arch-h" aria-label="started as a graphic design archive."><span id="arch-a">started as a </span><span class="hl" id="arch-b">graphic design archive.</span><span class="caret idle arch-caret" id="arch-caret" aria-hidden="true"></span></h2>
+  <div class="marquee rv" style="--d:1" aria-hidden="false"><div class="track"><img src="{{p0}}" alt="Poster 1 by @shuisbored" loading="eager"><img src="{{p1}}" alt="Poster 2 by @shuisbored" loading="eager"><img src="{{p2}}" alt="Poster 3 by @shuisbored" loading="eager"><img src="{{p3}}" alt="Poster 4 by @shuisbored" loading="eager"><img src="{{p4}}" alt="Poster 5 by @shuisbored" loading="eager"><img src="{{p5}}" alt="Poster 6 by @shuisbored" loading="eager"><img src="{{p6}}" alt="Poster 7 by @shuisbored" loading="eager"><img src="{{p7}}" alt="Poster 8 by @shuisbored" loading="eager"><img src="{{p8}}" alt="Poster 9 by @shuisbored" loading="eager"><img src="{{p9}}" alt="Poster 10 by @shuisbored" loading="eager"><img src="{{p10}}" alt="Poster 11 by @shuisbored" loading="eager"><img src="{{p0}}" alt="" aria-hidden="true"><img src="{{p1}}" alt="" aria-hidden="true"><img src="{{p2}}" alt="" aria-hidden="true"><img src="{{p3}}" alt="" aria-hidden="true"><img src="{{p4}}" alt="" aria-hidden="true"><img src="{{p5}}" alt="" aria-hidden="true"><img src="{{p6}}" alt="" aria-hidden="true"><img src="{{p7}}" alt="" aria-hidden="true"><img src="{{p8}}" alt="" aria-hidden="true"><img src="{{p9}}" alt="" aria-hidden="true"><img src="{{p10}}" alt="" aria-hidden="true"></div></div>
+</section>
+
+<!-- 04 BORED FILES -->
+<section class="slide scrub" id="s-bf" style="--len:260svh" data-stops="0,0.3,1" aria-label="The Bored Files, episode 0">
+  <div class="stage">
+    <div class="bf" id="bf">
+      <div class="folder" id="bf-folder"><div class="ico"><svg class="mac" viewBox="0 0 100 80" aria-hidden="true">
+<defs>
+<linearGradient id="fb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fb3f2"/><stop offset="1" stop-color="#3d8fd8"/></linearGradient>
+<linearGradient id="ff" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd6fb"/><stop offset=".12" stop-color="#7cc4f7"/><stop offset="1" stop-color="#58aaee"/></linearGradient>
+</defs>
+<path d="M6 10 Q6 5 11 5 H36 Q39 5 41 8 L44 12 H89 Q94 12 94 17 V70 Q94 75 89 75 H11 Q6 75 6 70 Z" fill="url(#fb)"/>
+<rect x="10" y="17" width="80" height="20" rx="2" fill="#ffffff" opacity=".9"/>
+<g class="flap"><path d="M5 26 Q5 22 9 22 H91 Q95 22 95 26 V71 Q95 76 90 76 H10 Q5 76 5 71 Z" fill="url(#ff)"/>
+<path d="M5.5 26 Q5.5 22.5 9 22.5 H91 Q94.5 22.5 94.5 26" fill="none" stroke="#c9ecff" stroke-width="1.2"/></g>
+</svg></div><span class="name">bored files</span></div>
+      <span class="zoomrect" id="bf-z1"></span><span class="zoomrect" id="bf-z2"></span>
+      <div class="vidwin" id="bf-win">
+        <div class="hov"><div class="win">
+          <div class="win-bar"><span>bored_files_ep_0.mp4</span><span class="win-btns"><i>_</i><i>□</i><i>×</i></span></div>
+          <div class="win-body">
+            <video id="bf-video" src="bored-files.mp4" muted loop playsinline preload="auto" aria-label="The Bored Files episode 0, playing silently on loop"></video>
+                      </div>
+        </div></div>
+      </div>
+      <svg class="pointer" id="bf-pointer" viewBox="0 0 24 30" aria-hidden="true"><path d="M2 2 L2 24 L8 18.5 L12 27 L15.5 25.5 L11.5 17 L19 17 Z" fill="#ffffff" stroke="#0b0b0f" stroke-width="2" stroke-linejoin="miter"/></svg>
+    </div>
+  </div>
+</section>
+
+<!-- 05 ORIGIN: ran out of ideas → Tyler card flips to your card → reel → metrics -->
+<section class="slide scrub" id="s-origin" style="--len:520svh" data-stops="0,0.12,0.28,0.52,0.78,1" aria-label="The origin story">
+  <div class="stage">
+    <div class="origin-wrap" id="origin">
+      <!-- "ran out of ideas" heading -->
+      <p class="origin-head" id="ori-head">ran out of <span class="hl">ideas.</span></p>
+      <!-- the two cards, one flips into the other -->
+      <div class="ori-card-wrap" id="ori-cards">
+        <div class="ori-card" id="ori-card">
+          <div class="face front"><img src="{{tyler_card}}" alt="Tyler Baudelaire — Call Me If You Get Lost license of travel"></div>
+          <div class="face back"><img src="{{shu_card}}" alt="Shubham Patil — custom CMIYGL-style card"></div>
+        </div>
+      </div>
+      <!-- the reel video in a Win95 window -->
+      <div class="ori-reel" id="ori-reel">
+        <div class="ori-vidwin">
+          <div class="win">
+            <div class="win-bar"><span>cmiygl_episode_10.mp4</span><span class="win-btns"><i>_</i><i>□</i><i>×</i></span></div>
+            <div class="win-body" style="padding:4px"><video id="ori-video" src="cmiygl-reel.mp4" muted loop playsinline preload="auto" style="display:block;width:100%;aspect-ratio:9/16;object-fit:cover;background:#000;box-shadow:var(--bevel-in)"></video></div>
+          </div>
+        </div>
+      </div>
+      <!-- metrics flanking the video -->
+      <div class="ori-metric ori-ml" id="ori-ml">
+        <div class="ori-stat"><span class="ori-num">3.5M</span><span class="ori-lbl">views</span></div>
+        <div class="ori-stat"><span class="ori-num">142K</span><span class="ori-lbl">likes</span></div>
+      </div>
+      <div class="ori-metric ori-mr" id="ori-mr">
+        <div class="ori-stat"><span class="ori-num">136K</span><span class="ori-lbl">saves</span></div>
+        <div class="ori-stat"><span class="ori-num">108K</span><span class="ori-lbl">shares</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 INBOX: DM requests flooding in -->
+<section class="slide scrub" id="s-inbox" style="--len:300svh" data-stops="0,0.4,1" aria-label="DM requests flooding in">
+  <div class="stage">
+    <div class="inbox-wrap" id="inbox-wrap">
+      <div class="inbox-cell" id="inbox-cell">
+        <div class="inbox-icon">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <span class="inbox-label">Inbox</span>
+        <span class="inbox-badge" id="inbox-badge">1</span>
+      </div>
+      <div class="dm-cloud" id="dm-cloud"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 BORN: the site idea + Vercel crash -->
+<section class="slide" id="s-born" aria-label="The site is born">
+  <div class="inner stack" style="align-items:center;text-align:center;gap:36px">
+    <p class="lede rv" style="max-width:none;font-size:clamp(24px,3vw,38px);color:var(--muted)">hmmm… i guess i can make my own site<br>with more templates</p>
+    <h2 class="rv" style="--d:1"><span class="hl">id generator</span> is born.</h2>
+    <div class="row rv" style="--d:2;justify-content:center;gap:24px;flex-wrap:wrap">
+      <img src="{{oscorp}}" alt="Oscorp card" style="height:min(180px,28vw);width:auto;border-radius:8px;box-shadow:0 8px 20px -8px rgba(11,11,15,.3)">
+      <img src="{{tva}}" alt="TVA card" style="height:min(180px,28vw);width:auto;border-radius:8px;box-shadow:0 8px 20px -8px rgba(11,11,15,.3)">
+      <img src="{{mclovin}}" alt="McLovin card" style="height:min(180px,28vw);width:auto;border-radius:8px;box-shadow:0 8px 20px -8px rgba(11,11,15,.3)">
+    </div>
+    <div class="win err rv" style="--d:3;max-width:520px" role="img" aria-label="Vercel usage exceeded">
+      <div class="win-bar"><span>id.patilshubham.me</span><span class="win-btns"><i>×</i></span></div>
+      <div class="win-body">
+        <div class="err-row"><img src="{{warning}}" alt="" style="width:48px"><div class="stack" style="gap:6px"><h3>Usage limit exceeded.</h3><p class="muted">Got so much traffic it exhausted the Vercel free plan.</p></div></div>
+        <div class="err-actions"><span class="btn">upgrade</span><span class="btn">cry</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 VOLUNTEER -->
+<section class="slide" id="s-volunteer" aria-label="Need a volunteer">
+  <div class="inner stack" style="align-items:center;text-align:center;gap:32px">
+    <h1 class="rv">need a volunteer!</h1>
+    <p class="lede rv" style="--d:1;max-width:none">(i got gifts if you do)</p>
+    <div class="win rv" style="--d:2;flex:none">
+      <div class="win-bar"><span>scan_me.png</span><span class="win-btns"><i>×</i></span></div>
+      <div class="win-body"><div class="qr"><img src="{{siteqr}}" alt="QR code linking to id.patilshubham.me"></div></div>
+    </div>
+    <p class="muted rv" style="--d:3">scan to try the site</p>
+  </div>
+</section>
+
+<!-- 10 LESSON -->
+<section class="slide" id="s-lesson" data-name="the lesson" data-f="5500" aria-label="What I learned">
+  <div class="sticker hide-sm" data-pz="-5,4,2" style="right:8%;top:14%;width:120px"><div class="pz"><img src="{{star}}" alt=""></div></div>
+  <div class="sticker hide-sm" data-pz="6,-4,-2" style="right:16%;bottom:16%;width:110px;animation-delay:-2s"><div class="pz"><img src="{{disc}}" alt=""></div></div>
+  <div class="inner">
+    <p class="label">what I took from it</p>
+    <p class="mega"><span class="w" style="--d:0">just</span> <span class="w" style="--d:1">keep</span> <span class="w" style="--d:2">creating.</span></p>
+    <p class="lede rv" style="--d:4">Make the thing you’d want for yourself. If it gets popular, great. If it doesn’t, make the next one.</p>
+  </div>
+</section>
+
+<!-- 11 CLOSE -->
+<section class="slide" id="s-close" data-name="thanks" data-f="5500" aria-label="Thanks">
+  <div class="sticker hide-sm" data-pz="5,3,-1" style="left:5%;top:10%;width:100px"><div class="pz"><img src="{{mug}}" alt=""></div></div>
+  <div class="inner row" style="justify-content:space-between">
+    <div class="grow stack">
+      <p class="label rv">thanks, demos anon</p>
+      <h1 class="rv" style="--d:1">go make your own id.</h1>
+      <div class="links rv" style="--d:2">
+        <a href="https://id.patilshubham.me" target="_blank" rel="noopener">id.patilshubham.me</a><br>
+        <a class="green" href="https://www.instagram.com/shuisbored/" target="_blank" rel="noopener">@shuisbored</a><br>
+        <a class="muted" href="https://github.com/Shucrates/id-generator" target="_blank" rel="noopener" style="font-size:.75em">github.com/Shucrates/id-generator</a>
+      </div>
+    </div>
+    <div class="win rv" style="--d:3;flex:none">
+      <div class="win-bar"><span>scan_me.png</span><span class="win-btns"><i>×</i></span></div>
+      <div class="win-body"><div class="qr"><img src="{{siteqr}}" alt="QR code linking to id.patilshubham.me"></div></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+
+<script>
+(function () {
+  var root = document.documentElement;
+  root.classList.add('js');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var hero = document.getElementById('s-hero');
+  var card = document.getElementById('idcard');
+
+  function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
+
+  // ── keyboard / clicker: each slide is a stop; the hero gets an extra stop once the card has flipped
+  function stops() {
+    var out = [];
+    slides.forEach(function (s) {
+      var top = s.getBoundingClientRect().top + scrollY;
+      var range = s.offsetHeight - innerHeight;
+      var fr = (s.dataset.stops || '0').split(',').map(Number);
+      fr.forEach(function (f) { out.push(top + Math.max(0, range) * f); });
+    });
+    return out;
+  }
+  function step(dir) {
+    var st = stops(), y = scrollY, target;
+    if (dir > 0) target = st.find(function (v) { return v > y + 4; });
+    else target = st.slice().reverse().find(function (v) { return v < y - 4; });
+    if (target === undefined) target = dir > 0 ? st[st.length - 1] : 0;
+    scrollTo({ top: target, behavior: reduce ? 'auto' : 'smooth' });
+  }
+  document.addEventListener('keydown', function (e) {
+    var k = e.key;
+    if (k === 'ArrowDown' || k === 'ArrowRight' || k === 'PageDown' || (k === ' ' && !e.shiftKey)) { e.preventDefault(); step(1); }
+    else if (k === 'ArrowUp' || k === 'ArrowLeft' || k === 'PageUp' || (k === ' ' && e.shiftKey)) { e.preventDefault(); step(-1); }
+    else if (k === 'f' || k === 'F') {
+      try { if (document.fullscreenElement) document.exitFullscreen().catch(function () {}); else root.requestFullscreen().catch(function () {}); } catch (err) {}
+    }
+  });
+
+  // ── helpers for scroll-scrubbed sections
+  function progress(sec) {
+    var range = sec.offsetHeight - innerHeight;
+    if (range <= 0) return 0;
+    return Math.max(0, Math.min(1, (scrollY - sec.offsetTop) / range));
+  }
+  function seg(p, a, b) { return Math.max(0, Math.min(1, (p - a) / (b - a))); }
+  function ease(t) { return t * t * (3 - 2 * t); }
+
+  // ── 00 typewriter: types like a person, deletes, retypes
+  var tText = document.getElementById('typer-text'), tCaret = document.getElementById('typer-caret');
+  var hiSec = document.getElementById('s-hi'), typed = '', token = 0, hiState = null;
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function typeTo(target) {
+    var my = ++token;
+    if (reduce) { typed = target; tText.textContent = target; return; }
+    tCaret.classList.remove('idle');
+    (async function () {
+      await wait(typed ? 250 : 700);
+      while (typed && target.indexOf(typed) !== 0) {           // backspace to a common prefix
+        if (my !== token) return;
+        typed = typed.slice(0, -1); tText.textContent = typed;
+        await wait(38 + Math.random() * 30);
+      }
+      if (typed !== target) await wait(320);
+      while (typed.length < target.length) {
+        if (my !== token) return;
+        var ch = target[typed.length];
+        typed += ch; tText.textContent = typed;
+        await wait(ch === ' ' ? 170 : 75 + Math.random() * 95);
+      }
+      if (my === token) tCaret.classList.add('idle');
+    })();
+  }
+  function hiUpdate() {
+    var want = progress(hiSec) > 0.35 ? 'who am I?' : 'hi dublin!';
+    if (want !== hiState) { hiState = want; typeTo(want); }
+  }
+  document.getElementById('hi-stage').addEventListener('click', function () { typed = ''; tText.textContent = ''; hiState = null; hiUpdate(); });
+
+  // ── 02 account: scroll moves the pointer, clicks the button, reveals the profile
+  var acctSec = document.getElementById('s-acct'), acct = document.getElementById('acct');
+  var btn = document.getElementById('create-btn'), pointer = document.getElementById('pointer'), ringClick = document.getElementById('click-ring');
+  var paneP = document.getElementById('pane-profile'), ringC = document.getElementById('ring-c');
+  var bio = document.getElementById('r-bio'), bioFull = bio.textContent;
+  var statEls = [1, 2, 3].map(function (n) { return document.getElementById('r-s' + n); });
+  var aP = 0;
+  function acctRender(p) {
+    var aw = acct.getBoundingClientRect(), bw = btn.offsetWidth, bh = btn.offsetHeight;
+    var tx = aw.width / 2 + bw * 0.12, ty = aw.height / 2 + bh * 0.12;
+    var sx = aw.width * 0.95, sy = aw.height * 1.02;
+    var m = ease(seg(p, 0.06, 0.34));
+    var x = sx + (tx - sx) * m, y = sy + (ty - sy) * m - Math.sin(m * Math.PI) * 50;
+    var down = p >= 0.38 && p < 0.44;
+    pointer.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + (down ? 0.86 : 1) + ')';
+    pointer.style.opacity = p < 0.04 ? seg(p, 0, 0.04) : 1 - seg(p, 0.48, 0.54);
+    btn.classList.toggle('pressed', down);
+    var c = seg(p, 0.38, 0.5);
+    ringClick.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + (0.4 + c * 1.6) + ')';
+    ringClick.style.opacity = c > 0 && c < 1 ? 1 - c : 0;
+    var out = seg(p, 0.44, 0.5);
+    btn.style.opacity = 1 - out;
+    btn.style.transform = (down ? 'translate(1px,1px) ' : '') + 'scale(' + (1 - out * 0.25) + ')';
+    btn.style.visibility = out >= 1 ? 'hidden' : 'visible';
+    var inn = seg(p, 0.48, 0.54);
+    paneP.style.opacity = inn; paneP.style.transform = 'translateY(' + (1 - inn) * 20 + 'px)';
+    paneP.style.visibility = inn <= 0 ? 'hidden' : 'visible';
+    ringC.setAttribute('stroke-dashoffset', (1 - ease(seg(p, 0.5, 0.64))).toFixed(3));
+    document.getElementById('r-handle').style.setProperty('--o', seg(p, 0.56, 0.62));
+    statEls.forEach(function (el, i) {
+      var t = seg(p, 0.62 + i * 0.05, 0.7 + i * 0.05), b = el.querySelector('b');
+      el.style.setProperty('--o', Math.min(1, t * 2));
+      b.textContent = Math.round(+b.dataset.to * ease(t));
+    });
+    bio.textContent = bioFull.slice(0, Math.round(bioFull.length * seg(p, 0.82, 0.9)));
+    document.getElementById('r-joined').style.setProperty('--o', seg(p, 0.9, 0.95));
+  }
+  function acctFrame() {
+    var target = progress(acctSec);
+    aP += (target - aP) * (reduce ? 1 : 0.14);
+    if (Math.abs(target - aP) < 0.0005) aP = target;
+    acctRender(aP);
+    requestAnimationFrame(acctFrame);
+  }
+  addEventListener('scroll', hiUpdate, { passive: true });
+  hiUpdate(); requestAnimationFrame(acctFrame);
+
+  // ── 03 archive heading: typed by the scroll as the slide comes up, finished once it is on screen
+  (function () {
+    var sec = document.getElementById('s-archive'), A = document.getElementById('arch-a'), B = document.getElementById('arch-b'), car = document.getElementById('arch-caret');
+    var tA = A.textContent, tB = B.textContent, full = tA + tB, last = -1, idleT;
+    function render() {
+      var top = sec.getBoundingClientRect().top, vh = innerHeight;
+      var t = Math.max(0, Math.min(1, (vh * 0.95 - top) / (vh * 0.8)));
+      var n = Math.round(full.length * t);
+      if (n === last) return;
+      last = n;
+      A.textContent = full.slice(0, Math.min(n, tA.length));
+      B.textContent = n > tA.length ? full.slice(tA.length, n) : '';
+      car.classList.remove('idle'); clearTimeout(idleT);
+      idleT = setTimeout(function () { car.classList.add('idle'); }, 400);
+    }
+    addEventListener('scroll', render, { passive: true });
+    addEventListener('resize', render);
+    render();
+  })();
+
+  // ── 04 bored files: pointer double-clicks the folder, the video window zooms out of it
+  (function () {
+    var sec = document.getElementById('s-bf'), stage = document.getElementById('bf');
+    var folder = document.getElementById('bf-folder'), ico = folder.querySelector('.ico');
+    var win = document.getElementById('bf-win'), vid = document.getElementById('bf-video'), ptr = document.getElementById('bf-pointer');
+    var z1 = document.getElementById('bf-z1'), z2 = document.getElementById('bf-z2');
+    var p = 0, playing = false;
+    function box(el) { var r = el.getBoundingClientRect(), s = stage.getBoundingClientRect(); return { x: r.left - s.left, y: r.top - s.top, w: r.width, h: r.height }; }
+    function zr(el, f, t, a) {
+      var x = f.x + (t.x - f.x) * a, y = f.y + (t.y - f.y) * a, w = f.w + (t.w - f.w) * a, h = f.h + (t.h - f.h) * a;
+      el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.width = w + 'px'; el.style.height = h + 'px';
+    }
+    function render(q) {
+      var S = stage.getBoundingClientRect(), fi = box(ico);
+      var fx = fi.x + fi.w * 0.55, fy = fi.y + fi.h * 0.55;
+      // pointer glides in, then double-clicks
+      var m = ease(seg(q, 0.04, 0.26));
+      var sx = S.width * 0.86, sy = S.height * 0.98;
+      var x = sx + (fx - sx) * m, y = sy + (fy - sy) * m - Math.sin(m * Math.PI) * 40;
+      var down = (q >= 0.27 && q < 0.29) || (q >= 0.31 && q < 0.33);
+      ptr.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + (down ? 0.86 : 1) + ')';
+      ptr.style.opacity = q < 0.03 ? seg(q, 0, 0.03) : 1 - seg(q, 0.4, 0.46);
+      folder.classList.toggle('sel', q >= 0.27);
+      folder.classList.toggle('is-open', q >= 0.33);
+      // window grows out of the folder (with Win95-style zoom outlines)
+      var g = ease(seg(q, 0.35, 0.55));
+      win.style.transform = 'none';
+      var W = box(win);
+      var cx = W.x + W.w / 2, cy = W.y + W.h / 2, s = 0.06 + 0.94 * g;
+      win.style.transform = 'translate(' + ((fx - cx) * (1 - g)) + 'px,' + ((fy - cy) * (1 - g)) + 'px) scale(' + s + ')';
+      win.style.opacity = q < 0.35 ? 0 : Math.min(1, seg(q, 0.35, 0.4) * 1.5);
+      var from = { x: fi.x, y: fi.y, w: fi.w, h: fi.h };
+      var a1 = seg(q, 0.33, 0.43), a2 = seg(q, 0.36, 0.48);
+      zr(z1, from, W, ease(a1)); z1.style.opacity = a1 > 0 && a1 < 1 ? 1 : 0;
+      zr(z2, from, W, ease(a2)); z2.style.opacity = a2 > 0 && a2 < 1 ? 1 : 0;
+      // play only while the window is open and the slide is on screen
+      var r = sec.getBoundingClientRect(), onScreen = r.bottom > 0 && r.top < innerHeight;
+      var want = q > 0.42 && onScreen;
+      if (want && !playing) { playing = true; var pr = vid.play(); if (pr && pr.catch) pr.catch(function () { playing = false; }); }
+      else if (!want && playing) { playing = false; vid.pause(); }
+    }
+    (function frame() {
+      var t = progress(sec);
+      p += (t - p) * (reduce ? 1 : 0.14);
+      if (Math.abs(t - p) < 0.0005) p = t;
+      render(p);
+      requestAnimationFrame(frame);
+    })();
+  })();
+
+  // ── 05 origin: "ran out of ideas" → Tyler card flips to your card → reel → metrics
+  (function () {
+    var sec = document.getElementById('s-origin');
+    var head = document.getElementById('ori-head'), cards = document.getElementById('ori-cards'), cardInner = document.getElementById('ori-card');
+    var reel = document.getElementById('ori-reel'), vid = document.getElementById('ori-video');
+    var ml = document.getElementById('ori-ml'), mr = document.getElementById('ori-mr');
+    var p = 0, playing = false;
+    function render(q) {
+      // q 0–0.12: heading fades in
+      var hIn = ease(seg(q, 0, 0.08));
+      var hOut = ease(seg(q, 0.14, 0.2));
+      head.style.opacity = hIn * (1 - hOut);
+      head.style.transform = 'translateY(' + ((1 - hIn) * 30 + hOut * -20) + 'px)';
+      // q 0.12–0.52: cards appear, flip from Tyler to Shubham
+      var cIn = ease(seg(q, 0.12, 0.18));
+      var flip = ease(seg(q, 0.24, 0.42));
+      var cOut = ease(seg(q, 0.48, 0.55));
+      cards.style.opacity = cIn * (1 - cOut);
+      cardInner.style.setProperty('--flip', flip.toFixed(4));
+      cardInner.style.setProperty('--g', (20 + flip * 60).toFixed(2));
+      // q 0.52–1: reel appears
+      var rIn = ease(seg(q, 0.52, 0.58));
+      var rScale = 0.7 + 0.3 * rIn;
+      reel.style.opacity = rIn;
+      reel.style.transform = 'scale(' + rScale + ')';
+      // play video when reel is visible
+      var r = sec.getBoundingClientRect(), onScreen = r.bottom > 0 && r.top < innerHeight;
+      var want = q > 0.55 && onScreen;
+      if (want && !playing) { playing = true; var pr = vid.play(); if (pr && pr.catch) pr.catch(function () { playing = false; }); }
+      else if (!want && playing) { playing = false; vid.pause(); }
+      // q 0.72–0.88: metrics slide in from sides
+      var mIn = ease(seg(q, 0.72, 0.85));
+      ml.style.opacity = mIn;
+      ml.style.transform = 'translateX(' + ((1 - mIn) * -60) + 'px)';
+      mr.style.opacity = mIn;
+      mr.style.transform = 'translateX(' + ((1 - mIn) * 60) + 'px)';
+    }
+    (function frame() {
+      var t = progress(sec);
+      p += (t - p) * (reduce ? 1 : 0.14);
+      if (Math.abs(t - p) < 0.0005) p = t;
+      render(p);
+      requestAnimationFrame(frame);
+    })();
+  })();
+
+  // ── inbox: badge counter + floating DM messages ──
+  (function () {
+    var sec = document.getElementById('s-inbox');
+    var badge = document.getElementById('inbox-badge');
+    var cloud = document.getElementById('dm-cloud');
+    var msgs = [
+      "can you make more templates?? 🙏",
+      "this is so cool, do a TVA one!",
+      "bro McLovin license WHEN",
+      "loved the card tutorial!! thank you",
+      "can you do an Oscorp one from Spider-Man?",
+      "just used your template, it's fire 🔥",
+      "please make more of these",
+      "this is the best thing I've seen on reels",
+      "how do I get more templates?",
+      "do you have a website for this?",
+      "I shared this with all my friends",
+      "NEED more cards like this 😍",
+      "you should sell these honestly",
+      "make a Hogwarts student ID!!",
+      "the CMIYGL card is perfect"
+    ];
+    var p = 0, count = 0, lastSpawn = 0, idx = 0, prevQ = 0;
+    function spawn() {
+      var el = document.createElement('div');
+      el.className = 'dm-float';
+      el.textContent = msgs[idx % msgs.length]; idx++;
+      var angle = Math.random() * Math.PI * 2;
+      var dist = 120 + Math.random() * 140;
+      el.style.left = 'calc(50% + ' + (Math.cos(angle) * dist) + 'px - 140px)';
+      el.style.top = 'calc(50% + ' + (Math.sin(angle) * dist) + 'px)';
+      cloud.appendChild(el);
+      el.addEventListener('animationend', function () { el.remove(); });
+    }
+    function render(q) {
+      // reset spawn tracking when user scrolls back up
+      if (q < prevQ - 0.05) { lastSpawn = q; }
+      prevQ = q;
+      var targetCount = Math.floor(q * 99) + 1;
+      if (targetCount !== count) { count = targetCount; badge.textContent = count > 99 ? '99+' : count; }
+      if (q > 0.05 && q - lastSpawn > 0.04) { lastSpawn = q; spawn(); }
+    }
+    (function frame() {
+      var t = progress(sec);
+      p += (t - p) * (reduce ? 1 : 0.14);
+      if (Math.abs(t - p) < 0.0005) p = t;
+      render(Math.max(0, Math.min(1, p)));
+      requestAnimationFrame(frame);
+    })();
+  })();
+
+  // ── the card: scroll drives the flip, the mouse adds tilt and moves the gloss
+  var flip = 0, flipTarget = 0, mx = 0, my = 0, mxT = 0, myT = 0;
+  function readScroll() {
+    var range = hero.offsetHeight - innerHeight;
+    var p = range > 0 ? (scrollY - hero.offsetTop) / range : 0;
+    p = Math.max(0, Math.min(1, p));
+    // hold the front for the first 15%, turn through the middle, hold the back at the end
+    var q = Math.max(0, Math.min(1, (p - 0.15) / 0.65));
+    flipTarget = q * q * (3 - 2 * q);
+  }
+  function frame() {
+    flip += (flipTarget - flip) * (reduce ? 1 : 0.12);
+    mx += (mxT - mx) * 0.08; my += (myT - my) * 0.08;
+    card.style.setProperty('--flip', flip.toFixed(4));
+    card.style.setProperty('--mx', mx.toFixed(4));
+    card.style.setProperty('--my', my.toFixed(4));
+    card.style.setProperty('--g', (18 + flip * 64 + mx * 22).toFixed(2));
+    requestAnimationFrame(frame);
+  }
+  addEventListener('scroll', readScroll, { passive: true });
+  addEventListener('resize', readScroll);
+  if (!reduce && window.matchMedia('(pointer: fine)').matches) {
+    document.addEventListener('mousemove', function (e) {
+      mxT = (e.clientX / innerWidth - 0.5) * 2;
+      myT = (e.clientY / innerHeight - 0.5) * 2;
+    });
+  }
+  readScroll(); requestAnimationFrame(frame);
+
+  // ── reveal each slide as it crosses the middle of the screen
+  var big = document.getElementById('bigcount'), bigDone = false;
+  function runBig() {
+    if (bigDone || reduce) return; bigDone = true;
+    var t0 = performance.now();
+    (function tick(t) {
+      var p = Math.min(1, (t - t0) / 1800), e = 1 - Math.pow(1 - p, 4);
+      big.textContent = fmt(150 + (5500 - 150) * e);
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
+  if (!reduce) big.textContent = '150';
+  var crash = document.getElementById('s-crash');
+  function onEnter(s) {
+    s.classList.add('in');
+    if (s.id === 's-numbers') runBig();
+    if (s === crash && !reduce) {
+      crash.classList.remove('glitch'); void crash.offsetWidth; crash.classList.add('glitch');
+      setTimeout(function () { crash.classList.remove('glitch'); }, 1700);
+    }
+  }
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) onEnter(en.target); });
+    }, { rootMargin: '-45% 0px -45% 0px' });
+    slides.forEach(function (s) { io.observe(s); });
+  } else {
+    slides.forEach(function (s) { s.classList.add('in'); });
+  }
+
+  // ── demo checklist
+  document.querySelectorAll('.steps button').forEach(function (b) {
+    b.addEventListener('click', function () { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); });
+  });
+
+  // ── draggable stickers + mouse parallax, like the site's landing page
+  document.querySelectorAll('.sticker').forEach(function (el) {
+    var ox = 0, oy = 0, sx = 0, sy = 0, dragging = false;
+    el.addEventListener('pointerdown', function (e) {
+      e.preventDefault(); dragging = true; el.classList.add('drag');
+      try { el.setPointerCapture(e.pointerId); } catch (err) {}
+      sx = e.clientX - ox; sy = e.clientY - oy;
+    });
+    el.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      ox = e.clientX - sx; oy = e.clientY - sy;
+      el.style.transform = 'translate(' + ox + 'px,' + oy + 'px)';
+    });
+    function up() { dragging = false; el.classList.remove('drag'); }
+    el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+  });
+  if (!reduce && window.matchMedia('(pointer: fine)').matches) {
+    var pz = Array.prototype.slice.call(document.querySelectorAll('[data-pz]'));
+    document.addEventListener('mousemove', function (e) {
+      var x = (e.clientX / innerWidth - 0.5) * 2, y = (e.clientY / innerHeight - 0.5) * 2;
+      pz.forEach(function (el) {
+        var v = el.dataset.pz.split(',').map(Number), inner = el.querySelector('.pz');
+        if (inner) inner.style.transform = 'translate(' + x * v[0] * 2 + 'px,' + y * v[1] * 2 + 'px) rotate(' + x * v[2] * 2 + 'deg)';
+      });
+    });
+  }
+})();
+</script>
