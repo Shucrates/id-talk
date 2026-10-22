@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Custom ID Talk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -98,6 +99,8 @@ p { margin: 0; max-width: 60ch; }
   box-shadow: 0 0 0 1px rgba(11,11,15,.08), 0 30px 60px -20px rgba(29,25,234,.28), 0 18px 30px -18px rgba(11,11,15,.35); }
 .face img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .face.back { transform: rotateY(180deg); }
+/* backface-visibility alone isn't reliable with the blended gloss layers on GPU, so JS also hides whichever face points away */
+.idcard.flipped .front, .idcard:not(.flipped) .back, .ori-card.flipped .front, .ori-card:not(.flipped) .back { visibility: hidden; }
 /* gloss: a moving specular band plus a faint holographic film */
 .face::before, .face::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; }
 .face::before { background: linear-gradient(115deg, transparent 32%, rgba(255,255,255,.75) 46%, rgba(255,255,255,.15) 52%, transparent 62%); background-size: 260% 100%; background-position: calc(var(--g, 50) * 1%) 0; mix-blend-mode: soft-light; opacity: .95; }
@@ -215,7 +218,13 @@ code { font-family: var(--f-pixel); font-size: 1.1em; background: #ececf1; paddi
 /* ── 11 close ── */
 .qr { width: min(300px, 70vw); background: var(--paper); padding: 10px; border: 1px solid var(--ink); }
 .qr img { display: block; width: 100%; image-rendering: pixelated; }
-.links { font-family: var(--f-pixel); font-size: clamp(26px, 2.6vw, 36px); line-height: 1.25; }
+.tpls { display: flex; flex-wrap: nowrap; justify-content: center; align-items: center; gap: clamp(28px, 6vw, 96px); max-width: 100%; }
+.tpls img { height: min(200px, 16vw); width: auto; border-radius: 8px; box-shadow: 0 8px 20px -8px rgba(11,11,15,.3); }
+.eps { display: flex; justify-content: center; align-items: center; gap: clamp(24px, 5vw, 72px); flex-wrap: wrap; }
+.eps .win { flex: none; }
+#s-collab video { display: block; width: 100%; max-height: 66svh; aspect-ratio: 16 / 9; object-fit: contain; background: #000; box-shadow: var(--bevel-in); cursor: pointer; }
+.eps video { display: block; height: min(72svh, 640px); aspect-ratio: 9 / 16; object-fit: cover; background: #000; box-shadow: var(--bevel-in); cursor: pointer; }
+.shot { display: block; width: 100%; height: auto; max-height: 48svh; object-fit: contain; background: #000; }
 
 
 /* ── scroll-scrubbed sections share a sticky stage ── */
@@ -264,11 +273,11 @@ code { font-family: var(--f-pixel); font-size: 1.1em; background: #ececf1; paddi
 
 /* ── 05 origin: card flip + reel + metrics ── */
 .origin-wrap { position: relative; width: 100%; height: 100%; display: grid; place-items: center; overflow: hidden; }
-.origin-head { position: absolute; font-family: var(--f-narrow); font-size: clamp(32px, 5vw, 72px); letter-spacing: -0.04em; line-height: 1; color: var(--ink); text-align: center; margin: 0; will-change: opacity, transform; }
-.ori-card-wrap { position: absolute; width: min(620px, 80vw); aspect-ratio: 1370 / 930; perspective: 1400px; will-change: opacity; }
+.origin-head { position: absolute; font-family: var(--f-narrow); font-size: clamp(24px, 3vw, 44px); letter-spacing: -0.04em; line-height: 1; color: var(--ink); text-align: center; margin: 0; will-change: opacity, transform; }
+.ori-card-wrap { position: absolute; width: min(620px, 80vw); aspect-ratio: 1960 / 1225; perspective: 1400px; will-change: opacity; }
 .ori-card { position: absolute; inset: 0; transform-style: preserve-3d; will-change: transform;
   transform: rotateY(calc(var(--flip, 0) * 180deg)) rotateX(4deg) rotateZ(-2deg); }
-.ori-card .face { position: absolute; inset: 0; border-radius: 14px; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+.ori-card .face { position: absolute; inset: 0; border-radius: 4.4% / 7%; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden;
   box-shadow: 0 24px 48px -16px rgba(11,11,15,.35); }
 .ori-card .face img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .ori-card .face.back { transform: rotateY(180deg); }
@@ -287,12 +296,12 @@ code { font-family: var(--f-pixel); font-size: 1.1em; background: #ececf1; paddi
 
 /* inbox */
 .inbox-wrap { position:relative; width:100%; height:100%; display:grid; place-items:center; overflow:hidden; }
-.inbox-cell { display:flex; align-items:center; gap:16px; background:#fff; border-radius:16px; padding:20px 36px; box-shadow:0 2px 12px rgba(0,0,0,.08); position:relative; z-index:2; }
+.inbox-cell { display:flex; align-items:center; gap:16px; background:linear-gradient(180deg, var(--grey-hi), var(--grey)); padding:18px 34px; box-shadow:var(--bevel), 0 0 0 1px #000, 6px 6px 0 rgba(11,11,15,.18); position:relative; z-index:2; }
 .inbox-icon { display:grid; place-items:center; }
-.inbox-label { font-family:var(--f-ui); font-size:clamp(28px,4vw,48px); font-weight:600; color:var(--ink); }
-.inbox-badge { position:absolute; top:-10px; right:-10px; min-width:28px; height:28px; line-height:28px; padding:0 8px; border-radius:14px; background:#ff3b30; color:#fff; font-family:var(--f-ui); font-size:15px; font-weight:700; text-align:center; }
+.inbox-label { font-family:var(--f-narrow); font-weight:700; font-size:clamp(34px,4.6vw,60px); letter-spacing:-0.03em; line-height:1; color:var(--ink); }
+.inbox-badge { position:absolute; top:-14px; right:-14px; min-width:34px; height:34px; line-height:34px; padding:0 8px; background:var(--red); color:var(--paper); font-family:var(--f-pixel); font-size:26px; text-align:center; box-shadow:0 0 0 1px #000, 3px 3px 0 rgba(11,11,15,.25); }
 .dm-cloud { position:absolute; inset:0; pointer-events:none; z-index:1; }
-.dm-cloud .dm-float { position:absolute; background:rgba(255,255,255,.75); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); border-radius:20px; padding:10px 18px; font-family:var(--f-ui); font-size:clamp(13px,1.4vw,16px); color:var(--ink); max-width:280px; opacity:0; animation:dmFloat 4s ease-out forwards; box-shadow:0 1px 6px rgba(0,0,0,.06); }
+.dm-cloud .dm-float { position:absolute; background:var(--paper); border:1px solid var(--ink); padding:8px 14px; font-family:var(--f-narrow); font-size:clamp(17px,1.7vw,22px); line-height:1.2; color:var(--ink); max-width:280px; opacity:0; animation:dmFloat 4s ease-out forwards; box-shadow:4px 4px 0 rgba(29,25,234,.25); }
 @keyframes dmFloat { 0%{opacity:0;transform:translateY(10px)} 12%{opacity:.65} 75%{opacity:.55} 100%{opacity:0;transform:translateY(-20px)} }
 
 /* ── 04 bored files: a folder that opens into a looping video ── */
@@ -470,21 +479,57 @@ code { font-family: var(--f-pixel); font-size: 1.1em; background: #ececf1; paddi
 </section>
 
 <!-- 07 BORN: the site idea + Vercel crash -->
-<section class="slide" id="s-born" aria-label="The site is born">
-  <div class="inner stack" style="align-items:center;text-align:center;gap:36px">
-    <p class="lede rv" style="max-width:none;font-size:clamp(24px,3vw,38px);color:var(--muted)">hmmm… i guess i can make my own site<br>with more templates</p>
-    <h2 class="rv" style="--d:1"><span class="hl">id generator</span> is born.</h2>
-    <div class="row rv" style="--d:2;justify-content:center;gap:24px;flex-wrap:wrap">
-      <img src="{{oscorp}}" alt="Oscorp card" style="height:min(180px,28vw);width:auto;border-radius:8px;box-shadow:0 8px 20px -8px rgba(11,11,15,.3)">
-      <img src="{{tva}}" alt="TVA card" style="height:min(180px,28vw);width:auto;border-radius:8px;box-shadow:0 8px 20px -8px rgba(11,11,15,.3)">
-      <img src="{{mclovin}}" alt="McLovin card" style="height:min(180px,28vw);width:auto;border-radius:8px;box-shadow:0 8px 20px -8px rgba(11,11,15,.3)">
-    </div>
-    <div class="win err rv" style="--d:3;max-width:520px" role="img" aria-label="Vercel usage exceeded">
-      <div class="win-bar"><span>id.patilshubham.me</span><span class="win-btns"><i>×</i></span></div>
-      <div class="win-body">
-        <div class="err-row"><img src="{{warning}}" alt="" style="width:48px"><div class="stack" style="gap:6px"><h3>Usage limit exceeded.</h3><p class="muted">Got so much traffic it exhausted the Vercel free plan.</p></div></div>
-        <div class="err-actions"><span class="btn">upgrade</span><span class="btn">cry</span></div>
+<section class="slide scrub" id="s-born" style="--len:200svh" data-stops="0,1" aria-label="The site is born">
+  <div class="stage">
+    <div class="stack" style="align-items:center;text-align:center;gap:48px">
+      <h2 id="born-head" style="font-size:clamp(32px,4.2vw,60px);opacity:0"><span class="hl">id generator</span> is born.</h2>
+      <div class="tpls rv">
+        <img src="{{oscorp}}" alt="Oscorp card">
+        <img src="{{tva}}" alt="TVA card">
+        <img src="{{mclovin}}" alt="McLovin card">
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07c EPISODES -->
+<section class="slide" id="s-eps" aria-label="Episodes made with the site: Loki TVA card and The Amazing Spider-Man">
+  <div class="inner stack" style="align-items:center;text-align:center;gap:28px">
+    <div class="eps">
+      <div class="win rv">
+        <div class="win-bar"><span>ep13_loki_tva.mp4</span><span class="win-btns"><i>×</i></span></div>
+        <div class="win-body" style="padding:4px"><video src="loki-tva.mp4" muted loop playsinline preload="auto" aria-label="Episode 13: Loki TVA card. Click for sound."></video></div>
+      </div>
+      <div class="win rv" style="--d:1">
+        <div class="win-bar"><span>ep11_tasm.mp4</span><span class="win-btns"><i>×</i></span></div>
+        <div class="win-body" style="padding:4px"><video src="tasm.mp4" muted loop playsinline preload="auto" aria-label="Episode 11: The Amazing Spider-Man. Click for sound."></video></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07b TRAFFIC -->
+<section class="slide" id="s-traffic" aria-label="So much traffic it exhausted the Vercel free plan">
+  <div class="inner stack" style="align-items:center;text-align:center;gap:28px">
+    <div class="win err rv" style="width:min(960px,100%)">
+      <div class="win-bar"><span>inbox — 1 new</span><span class="win-btns"><i>×</i></span></div>
+      <div class="win-body" style="padding:6px"><img class="shot" src="{{vercel_mail}}" alt="Email from Vercel: Approaching your limits: upgrade now to avoid service disruption"></div>
+    </div>
+    <div class="win rv" style="--d:1;width:min(960px,100%)">
+      <div class="win-bar"><span>vercel_analytics.exe</span><span class="win-btns"><i>×</i></span></div>
+      <div class="win-body" style="padding:6px"><img class="shot" src="{{vercel_stats}}" alt="Vercel analytics: 20,229 visitors and 31,236 page views in two weeks"></div>
+    </div>
+    <p class="lede rv" style="--d:2;max-width:none">20k visitors in two weeks. the vercel free plan did not survive.</p>
+  </div>
+</section>
+
+<!-- 07d COLLABS -->
+<section class="slide" id="s-collab" aria-label="Also got collabs">
+  <div class="inner stack" style="align-items:center;text-align:center;gap:32px">
+    <h2 class="rv">also got <span class="hl">collabs.</span></h2>
+    <div class="win rv" style="--d:1;width:min(1000px,100%)">
+      <div class="win-bar"><span>collab_final.mp4</span><span class="win-btns"><i>×</i></span></div>
+      <div class="win-body" style="padding:4px"><video src="collab.mp4" muted loop playsinline preload="auto" aria-label="Collab video. Click for sound."></video></div>
     </div>
   </div>
 </section>
@@ -507,28 +552,23 @@ code { font-family: var(--f-pixel); font-size: 1.1em; background: #ececf1; paddi
   <div class="sticker hide-sm" data-pz="-5,4,2" style="right:8%;top:14%;width:120px"><div class="pz"><img src="{{star}}" alt=""></div></div>
   <div class="sticker hide-sm" data-pz="6,-4,-2" style="right:16%;bottom:16%;width:110px;animation-delay:-2s"><div class="pz"><img src="{{disc}}" alt=""></div></div>
   <div class="inner">
-    <p class="label">what I took from it</p>
+    <p class="label">what i learnt</p>
     <p class="mega"><span class="w" style="--d:0">just</span> <span class="w" style="--d:1">keep</span> <span class="w" style="--d:2">creating.</span></p>
     <p class="lede rv" style="--d:4">Make the thing you’d want for yourself. If it gets popular, great. If it doesn’t, make the next one.</p>
   </div>
 </section>
 
 <!-- 11 CLOSE -->
-<section class="slide" id="s-close" data-name="thanks" data-f="5500" aria-label="Thanks">
+<section class="slide" id="s-close" data-name="thanks" data-f="5500" aria-label="Thank you so much! Let's connect">
   <div class="sticker hide-sm" data-pz="5,3,-1" style="left:5%;top:10%;width:100px"><div class="pz"><img src="{{mug}}" alt=""></div></div>
   <div class="inner row" style="justify-content:space-between">
-    <div class="grow stack">
-      <p class="label rv">thanks, demos anon</p>
-      <h1 class="rv" style="--d:1">go make your own id.</h1>
-      <div class="links rv" style="--d:2">
-        <a href="https://id.patilshubham.me" target="_blank" rel="noopener">id.patilshubham.me</a><br>
-        <a class="green" href="https://www.instagram.com/shuisbored/" target="_blank" rel="noopener">@shuisbored</a><br>
-        <a class="muted" href="https://github.com/Shucrates/id-generator" target="_blank" rel="noopener" style="font-size:.75em">github.com/Shucrates/id-generator</a>
-      </div>
+    <div class="grow stack" style="gap:20px">
+      <h1 class="rv" style="color:var(--ink)">thank you so much!</h1>
+      <h2 class="rv" style="--d:1">let’s connect.</h2>
     </div>
     <div class="win rv" style="--d:3;flex:none">
-      <div class="win-bar"><span>scan_me.png</span><span class="win-btns"><i>×</i></span></div>
-      <div class="win-body"><div class="qr"><img src="{{siteqr}}" alt="QR code linking to id.patilshubham.me"></div></div>
+      <div class="win-bar"><span>linktr.ee/shuisbored</span><span class="win-btns"><i>×</i></span></div>
+      <div class="win-body"><div class="qr"><img src="{{linksqr}}" alt="QR code linking to linktr.ee/shuisbored"></div></div>
     </div>
   </div>
 </section>
@@ -544,8 +584,6 @@ code { font-family: var(--f-pixel); font-size: 1.1em; background: #ececf1; paddi
   var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
   var hero = document.getElementById('s-hero');
   var card = document.getElementById('idcard');
-
-  function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
 
   // ── keyboard / clicker: each slide is a stop; the hero gets an extra stop once the card has flipped
   function stops() {
@@ -751,6 +789,7 @@ code { font-family: var(--f-pixel); font-size: 1.1em; background: #ececf1; paddi
       cards.style.opacity = cIn * (1 - cOut);
       cardInner.style.setProperty('--flip', flip.toFixed(4));
       cardInner.style.setProperty('--g', (20 + flip * 60).toFixed(2));
+      cardInner.classList.toggle('flipped', flip > 0.5);
       // q 0.52–1: reel appears
       var rIn = ease(seg(q, 0.52, 0.58));
       var rScale = 0.7 + 0.3 * rIn;
@@ -777,6 +816,18 @@ code { font-family: var(--f-pixel); font-size: 1.1em; background: #ececf1; paddi
     })();
   })();
 
+  // ── born: templates are already up; the headline fades in as you scroll through the slide
+  (function () {
+    var sec = document.getElementById('s-born'), head = document.getElementById('born-head');
+    if (reduce) { head.style.opacity = 1; return; }
+    function render() {
+      var t = ease(seg(progress(sec), 0.15, 0.55));
+      head.style.opacity = t;
+      head.style.transform = 'translateY(' + ((1 - t) * 26) + 'px)';
+    }
+    addEventListener('scroll', render, { passive: true }); render();
+  })();
+
   // ── inbox: badge counter + floating DM messages ──
   (function () {
     var sec = document.getElementById('s-inbox');
@@ -799,7 +850,7 @@ code { font-family: var(--f-pixel); font-size: 1.1em; background: #ececf1; paddi
       "make a Hogwarts student ID!!",
       "the CMIYGL card is perfect"
     ];
-    var p = 0, count = 0, lastSpawn = 0, idx = 0, prevQ = 0;
+    var p = 0, count = 0, lastSpawn = 0, idx = 0;
     function spawn() {
       var el = document.createElement('div');
       el.className = 'dm-float';
@@ -812,12 +863,11 @@ code { font-family: var(--f-pixel); font-size: 1.1em; background: #ececf1; paddi
       el.addEventListener('animationend', function () { el.remove(); });
     }
     function render(q) {
-      // reset spawn tracking when user scrolls back up
-      if (q < prevQ - 0.05) { lastSpawn = q; }
-      prevQ = q;
       var targetCount = Math.floor(q * 99) + 1;
       if (targetCount !== count) { count = targetCount; badge.textContent = count > 99 ? '99+' : count; }
-      if (q > 0.05 && q - lastSpawn > 0.04) { lastSpawn = q; spawn(); }
+      // spawn every few % of scroll in either direction, so a second pass floods again
+      if (q < 0.02) lastSpawn = 0;
+      else if (q < 0.98 && Math.abs(q - lastSpawn) > 0.03) { lastSpawn = q; spawn(); }
     }
     (function frame() {
       var t = progress(sec);
@@ -845,6 +895,7 @@ code { font-family: var(--f-pixel); font-size: 1.1em; background: #ececf1; paddi
     card.style.setProperty('--mx', mx.toFixed(4));
     card.style.setProperty('--my', my.toFixed(4));
     card.style.setProperty('--g', (18 + flip * 64 + mx * 22).toFixed(2));
+    card.classList.toggle('flipped', Math.cos((-16 + flip * 180 + mx * 9) * Math.PI / 180) < 0);
     requestAnimationFrame(frame);
   }
   addEventListener('scroll', readScroll, { passive: true });
@@ -858,26 +909,20 @@ code { font-family: var(--f-pixel); font-size: 1.1em; background: #ececf1; paddi
   readScroll(); requestAnimationFrame(frame);
 
   // ── reveal each slide as it crosses the middle of the screen
-  var big = document.getElementById('bigcount'), bigDone = false;
-  function runBig() {
-    if (bigDone || reduce) return; bigDone = true;
-    var t0 = performance.now();
-    (function tick(t) {
-      var p = Math.min(1, (t - t0) / 1800), e = 1 - Math.pow(1 - p, 4);
-      big.textContent = fmt(150 + (5500 - 150) * e);
-      if (p < 1) requestAnimationFrame(tick);
-    })(t0);
-  }
-  if (!reduce) big.textContent = '150';
-  var crash = document.getElementById('s-crash');
-  function onEnter(s) {
-    s.classList.add('in');
-    if (s.id === 's-numbers') runBig();
-    if (s === crash && !reduce) {
-      crash.classList.remove('glitch'); void crash.offsetWidth; crash.classList.add('glitch');
-      setTimeout(function () { crash.classList.remove('glitch'); }, 1700);
-    }
-  }
+  function onEnter(s) { s.classList.add('in'); }
+
+  // ── episode + collab videos: play only while their slide is on screen; click a video to toggle its sound
+  ['s-eps', 's-collab'].forEach(function (id) {
+    var sec = document.getElementById(id), vids = [].slice.call(sec.querySelectorAll('video'));
+    vids.forEach(function (v) { v.addEventListener('click', function () { v.muted = !v.muted; if (v.paused) v.play(); }); });
+    if (!('IntersectionObserver' in window)) return;
+    new IntersectionObserver(function (entries) {
+      vids.forEach(function (v) {
+        if (entries[0].isIntersecting) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
+        else { v.pause(); v.muted = true; }
+      });
+    }, { threshold: 0.4 }).observe(sec);
+  });
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) { if (en.isIntersecting) onEnter(en.target); });

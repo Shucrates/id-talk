@@ -1,0 +1,65 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>shubham patil — links</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Sans+Narrow:wght@400;700&family=VT323&display=swap">
+<style>
+/* Same desktop + Win95 language as the talk: #fafafa desk, one window, bevelled buttons. */
+:root {
+  --desk: #fafafa;
+  --ink: #0b0b0f;
+  --blue: #1d19ea;
+  --green: #12ba10;
+  --grey: #c0c0c0;
+  --grey-hi: #dfdfdf;
+  --muted: #55555f;
+  --paper: #ffffff;
+  --f-narrow: 'PT Sans Narrow', 'Arial Narrow', Arial, sans-serif;
+  --f-pixel: 'VT323', 'Courier New', monospace;
+  --bevel: inset 1px 1px 0 #ffffff, inset 2px 2px 0 #e0e0e0, inset -1px -1px 0 #505050, inset -2px -2px 0 #808080;
+  --bevel-in: inset -1px -1px 0 #ffffff, inset -2px -2px 0 #e0e0e0, inset 1px 1px 0 #505050, inset 2px 2px 0 #808080;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100svh; display: grid; place-items: center; padding: 32px max(16px, env(safe-area-inset-left, 0px)); background: var(--desk); color: var(--ink); font-family: var(--f-narrow); font-size: 20px; line-height: 1.4; }
+::selection { background: var(--blue); color: var(--paper); }
+:focus-visible { outline: 3px dashed var(--blue); outline-offset: 3px; }
+
+.win { width: min(440px, 100%); background: var(--grey); box-shadow: var(--bevel), 0 0 0 1px #000, 6px 6px 0 rgba(11,11,15,.18); padding: 4px; }
+.win-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: linear-gradient(90deg, var(--blue), #6f8cff); color: var(--paper); padding: 3px 4px 3px 8px; font-family: var(--f-pixel); font-size: 22px; line-height: 1; }
+.win-btns i { width: 22px; height: 20px; background: var(--grey); box-shadow: var(--bevel); color: var(--ink); font-style: normal; font-size: 18px; display: grid; place-items: center; }
+.win-body { padding: 24px 20px 20px; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; }
+
+.avatar { width: 112px; height: 112px; object-fit: cover; border-radius: 50%; box-shadow: 0 0 0 3px var(--paper), 0 0 0 4px #000; }
+h1 { margin: 0; font-weight: 400; font-size: 48px; line-height: .95; letter-spacing: -0.04em; color: var(--blue); }
+.handle { margin: 0; font-family: var(--f-pixel); font-size: 24px; color: var(--muted); }
+
+.links { list-style: none; margin: 6px 0 0; padding: 0; width: 100%; display: flex; flex-direction: column; gap: 12px; }
+.btn { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; font-family: var(--f-narrow); font-weight: 700; font-size: 22px; color: var(--ink); text-decoration: none; background: linear-gradient(180deg, var(--grey-hi), var(--grey)); padding: 12px 18px; box-shadow: var(--bevel), 0 0 0 1px #000; }
+.btn span { font-family: var(--f-pixel); font-weight: 400; font-size: 20px; color: var(--muted); }
+.btn:hover { box-shadow: var(--bevel), 0 0 0 3px #000; }
+.btn:active { box-shadow: var(--bevel-in), 0 0 0 1px #000; transform: translate(1px,1px); }
+.btn.hot { background: var(--blue); color: var(--paper); }
+.btn.hot span { color: #c9cfff; }
+
+.foot { margin: 4px 0 0; font-family: var(--f-pixel); font-size: 18px; color: var(--muted); }
+</style>
+
+<main class="win">
+  <div class="win-bar"><span>shuisbored.exe</span><span class="win-btns"><i>×</i></span></div>
+  <div class="win-body">
+    <img class="avatar" src="{{avatar}}" alt="Shubham holding a camera">
+    <div>
+      <h1>shubham patil</h1>
+      <p class="handle">@shuisbored</p>
+    </div>
+    <ul class="links">
+      <li><a class="btn hot" href="https://id.patilshubham.me" target="_blank" rel="noopener">id generator <span>id.patilshubham.me</span></a></li>
+      <li><a class="btn" href="https://www.instagram.com/shuisbored/" target="_blank" rel="noopener">instagram <span>@shuisbored</span></a></li>
+      <li><a class="btn" href="https://github.com/Shucrates" target="_blank" rel="noopener">github <span>Shucrates</span></a></li>
+      <li><a class="btn" href="{{linkedin}}" target="_blank" rel="noopener">linkedin <span>shubham patil</span></a></li>
+    </ul>
+    <p class="foot">just keep creating.</p>
+  </div>
+</main>
